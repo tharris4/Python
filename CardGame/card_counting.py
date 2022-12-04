@@ -44,7 +44,7 @@ class deck:
         if dc < 13:
             return(False, "Missing diamond cards")
         if sc < 13:
-            return(False, "Missing space cards.")
+            return(False, "Missing spade cards.")
         if cc < 13:
             return(False, "Missing clover cards.")
         
@@ -55,7 +55,7 @@ newDeck = deck()
 print("Opening the deck of cards...\n")
 
 #open the deck file and create deck of cards
-with open('deck.csv') as cards:
+with open("deck.csv") as cards:
     csv_reader = csv.reader(cards, delimiter=',')
     for row in csv_reader:
         newCard = card(row[0], row[1])
@@ -78,9 +78,6 @@ if proceed:
     #show us all the cards
     #for theCard in newDeck.cards:
     #    print(theCard.num, theCard.shape, theCard.color)
-
-    #count variables
-    rc, bc, sc, cc, hc, dc = 0,0,0,0,0,0
 
     def IsItValid(GuessCard):
         cardFound = False
