@@ -1,5 +1,6 @@
 import csv
 import math
+import tkinter as tk
 
 class state:
     def __init__(self, name, lat, long, abbr):
@@ -27,13 +28,9 @@ with open('usstates.csv') as csvfile:
 if len(states) == 52:
     print("Got all the states!")
 
-
-while True:
-    firstStateName = input("Name the first state: ")
-    secondStateName = input("Name the second state: ")
-
-    firstState = isValidSate(states, firstStateName)
-    secondState = isValidSate(states, secondStateName)
+def calcDistance():
+    firstState = isValidSate(states, firstStateEntry.get())
+    secondState = isValidSate(states, secondStateEntry.get())
 
     if firstState and secondState:
         lat1, lat2 = float(firstState.lat), float(secondState.lat)
@@ -51,7 +48,42 @@ while True:
         #conver to miles
         dist = dist/1609.34
 
-        print("The distance is {:,} ".format(int(dist)), "miles.")
+        answerText = "The distance is {:,} ".format(int(dist)), "miles."
+        answerLabel.config(text = answerText)
 
     else:
-        print("Not a valid state.")
+        answerLabel["text"] = "Not a valid state."
+
+window = tk.Tk()
+window.title("Geo Guesser!")
+window.resizable(width=False, height=False)
+
+frm_entry = tk.Frame(master=window)
+welcomeLabel = tk.Label(master=frm_entry, text="Type two states and guess the distance between them.")
+firstStateLabel = tk.Label(master=frm_entry, text="State #1: ")
+firstStateEntry = tk.Entry(master=frm_entry, width=25)
+secondStateLabel = tk.Label(master=frm_entry, text="State #2: ")
+secondStateEntry = tk.Entry(master=frm_entry,  width=25)
+
+welcomeLabel.grid(row=0, column=0, columnspan=2, sticky="n")
+
+firstStateLabel.grid(row=1, column=0, sticky="w")
+firstStateEntry.grid(row=1, column=1, sticky="w")
+
+secondStateLabel.grid(row=2, column=0, sticky="w")
+secondStateEntry.grid(row=2, column=1, sticky="w")
+
+submit_btn = tk.Button(
+    master=window,
+    text="Enter",
+    command=calcDistance
+)
+
+answerLabel = tk.Label(master=window, text="")
+
+frm_entry.grid(row=0, column=0, padx=10)
+submit_btn.grid(row=3, column=0, pady=10)
+answerLabel.grid(row=4, column=0, padx=10)
+
+window.mainloop()
+
