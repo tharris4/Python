@@ -2,6 +2,7 @@ import csv
 import math
 import tkinter as tk
 from tkinter import ttk
+import tkinter.font as font
 
 class state:
     def __init__(self, name, lat, long, abbr):
@@ -75,12 +76,16 @@ class App(tk.Tk):
         self.resizable(width=False, height=False)
 
         self.frm_entry = tk.Frame(master=self)
-        self.welcomeLabel = ttk.Label(master=self.frm_entry, text="Type two states and guess the distance between them.")
+        self.welcomeLabel = ttk.Label(master=self.frm_entry, font=("Arial", 30), text="Type two states and guess the distance between them.")
 
-        self.firstStateLabel = ttk.Label(master=self.frm_entry, text="State #1: ")
-        self.firstStateEntry = ttk.Entry(master=self.frm_entry, width=25)
-        self.secondStateLabel = ttk.Label(master=self.frm_entry, text="State #2: ")
-        self.secondStateEntry = ttk.Entry(master=self.frm_entry,  width=25)
+        self.firstStateLabel = ttk.Label(master=self.frm_entry, 
+                                         text="State #1: ",
+                                         font=("Arial", 15))
+        self.firstStateEntry = ttk.Entry(master=self.frm_entry, width=15, font=("Arial", 25))
+        self.secondStateLabel = ttk.Label(master=self.frm_entry, 
+                                        text="State #2: ",
+                                        font=("Arial",15))
+        self.secondStateEntry = ttk.Entry(master=self.frm_entry,  width=15, font=("Arial", 25))
 
         self.welcomeLabel.grid(row=0, column=0, columnspan=2, sticky="n")
 
@@ -90,14 +95,17 @@ class App(tk.Tk):
         self.secondStateLabel.grid(row=2, column=0, sticky="w")
         self.secondStateEntry.grid(row=2, column=1, sticky="w")
 
-        self.answerLabel = ttk.Label(master=self, text="")
+        self.answerLabel = ttk.Label(master=self, font=("Arial", 15), text="")
+
+        btFont = font.Font(size=15)
 
         self.submit_btn = ttk.Button(
             master=self,
             text="Enter",
             command=self.calcDistance
         )
-
+        
+ 
         self.frm_entry.grid(row=0, column=0, padx=10)
         self.submit_btn.grid(row=3, column=0, pady=10)
         self.answerLabel.grid(row=4, column=0, padx=10)
