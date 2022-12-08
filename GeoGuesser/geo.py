@@ -1,6 +1,8 @@
 import csv
 import math
 import tkinter as tk
+from tkinter import ttk
+import tkinter.font as font
 
 class state:
     def __init__(self, name, lat, long, abbr):
@@ -9,81 +11,105 @@ class state:
         self.long = long
         self.abbr = abbr
 
-def isValidSate(stateList, checkStateName):
-    stateFound = False
-    for curState in stateList:
-        if curState.name.lower() == checkStateName.lower():
-            stateFound = curState
-            break
-    return stateFound
 
-states = []
+class App(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Geo Guesser!")
+        self.createWidgets()
 
-with open('usstates.csv') as csvfile:
-    csv_reader = csv.DictReader(csvfile)
-    for row in csv_reader:
-        newState = state(abbr=row['state'], name=row['name'], lat=row['latitude'], long=row['longitude'])
-        states.append(newState)
+    def isValidSate(self, checkStateName):
+        stateFound = False
+        for curState in self.states:
+            if curState.name.lower() == checkStateName.lower():
+                stateFound = curState
+                break
+        return stateFound
 
-if len(states) == 52:
-    print("Got all the states!")
+    def getStates():
+        states = []
+        with open('usstates.csv') as csvfile:
+            csv_reader = csv.DictReader(csvfile)
+            for row in csv_reader:
+                newState = state(abbr=row['state'], name=row['name'], lat=row['latitude'], long=row['longitude'])
+                states.append(newState)
 
-def calcDistance():
-    firstState = isValidSate(states, firstStateEntry.get())
-    secondState = isValidSate(states, secondStateEntry.get())
+        if len(states) == 52:
+            print("Got all the states!")
+            return states
 
-    if firstState and secondState:
-        lat1, lat2 = float(firstState.lat), float(secondState.lat)
-        long1, long2 = float(firstState.long), float(secondState.long)
+    states = getStates()
 
-        R = 6371000
-        l1 = lat1 * math.pi/180
-        l2 = lat2 * math.pi/180
-        dlat = (lat2 - lat1) * math.pi/180
-        dlong = (long2 - long1) * math.pi/180
+    def showMessage(self, text):
+        self.answerLabel.config(text = text)
 
-        a = math.sin(dlat/2)*math.sin(dlat/2) + math.cos(l1)*math.cos(l2)*math.sin(dlong/2)*math.sin(dlong/2)
-        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-        dist = R * c
-        #conver to miles
-        dist = dist/1609.34
+    def calcDistance(self):
+        
+        state1 = self.firstStateEntry.get()
+        state2 = self.secondStateEntry.get()
 
-        answerText = "The distance is {:,} ".format(int(dist)), "miles."
-        answerLabel.config(text = answerText)
+        firstState = self.isValidSate(state1)
+        secondState = self.isValidSate(state2)
+        
+        if firstState and secondState:
+            lat1, lat2 = float(firstState.lat), float(secondState.lat)
+            long1, long2 = float(firstState.long), float(secondState.long)
 
-    else:
-        answerLabel["text"] = "Not a valid state."
+            R = 6371000
+            l1 = lat1 * math.pi/180
+            l2 = lat2 * math.pi/180
+            dlat = (lat2 - lat1) * math.pi/180
+            dlong = (long2 - long1) * math.pi/180
 
-window = tk.Tk()
-window.title("Geo Guesser!")
-window.resizable(width=False, height=False)
+            a = math.sin(dlat/2)*math.sin(dlat/2) + math.cos(l1)*math.cos(l2)*math.sin(dlong/2)*math.sin(dlong/2)
+            c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+            dist = R * c
+            #convert to miles
+            dist = dist/1609.34
 
-frm_entry = tk.Frame(master=window)
-welcomeLabel = tk.Label(master=frm_entry, text="Type two states and guess the distance between them.")
-firstStateLabel = tk.Label(master=frm_entry, text="State #1: ")
-firstStateEntry = tk.Entry(master=frm_entry, width=25)
-secondStateLabel = tk.Label(master=frm_entry, text="State #2: ")
-secondStateEntry = tk.Entry(master=frm_entry,  width=25)
+            self.showMessage(["The distance is {:,} ".format(int(dist)), "miles."])
 
-welcomeLabel.grid(row=0, column=0, columnspan=2, sticky="n")
+        else:
+            self.showMessage("Not a valid state.")
 
-firstStateLabel.grid(row=1, column=0, sticky="w")
-firstStateEntry.grid(row=1, column=1, sticky="w")
+    def createWidgets(self):
+        self.resizable(width=False, height=False)
 
-secondStateLabel.grid(row=2, column=0, sticky="w")
-secondStateEntry.grid(row=2, column=1, sticky="w")
+        self.frm_entry = tk.Frame(master=self)
+        self.welcomeLabel = ttk.Label(master=self.frm_entry, font=("Arial", 30), text="Type two states and guess the distance between them.")
 
-submit_btn = tk.Button(
-    master=window,
-    text="Enter",
-    command=calcDistance
-)
+        self.firstStateLabel = ttk.Label(master=self.frm_entry, 
+                                         text="State #1: ",
+                                         font=("Arial", 15))
+        self.firstStateEntry = ttk.Entry(master=self.frm_entry, width=15, font=("Arial", 25))
+        self.secondStateLabel = ttk.Label(master=self.frm_entry, 
+                                        text="State #2: ",
+                                        font=("Arial",15))
+        self.secondStateEntry = ttk.Entry(master=self.frm_entry,  width=15, font=("Arial", 25))
 
-answerLabel = tk.Label(master=window, text="")
+        self.welcomeLabel.grid(row=0, column=0, columnspan=2, sticky="n")
 
-frm_entry.grid(row=0, column=0, padx=10)
-submit_btn.grid(row=3, column=0, pady=10)
-answerLabel.grid(row=4, column=0, padx=10)
+        self.firstStateLabel.grid(row=1, column=0, sticky="w")
+        self.firstStateEntry.grid(row=1, column=1, sticky="w")
 
-window.mainloop()
+        self.secondStateLabel.grid(row=2, column=0, sticky="w")
+        self.secondStateEntry.grid(row=2, column=1, sticky="w")
 
+        self.answerLabel = ttk.Label(master=self, font=("Arial", 15), text="")
+
+        btFont = font.Font(size=15)
+
+        self.submit_btn = ttk.Button(
+            master=self,
+            text="Enter",
+            command=self.calcDistance
+        )
+        
+ 
+        self.frm_entry.grid(row=0, column=0, padx=10)
+        self.submit_btn.grid(row=3, column=0, pady=10)
+        self.answerLabel.grid(row=4, column=0, padx=10)
+
+if __name__ == '__main__':
+    app = App()
+    app.mainloop()
