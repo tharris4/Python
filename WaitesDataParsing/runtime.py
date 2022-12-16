@@ -38,19 +38,20 @@ class App(tk.Tk):
                 runTime += (endRun - startRun)
                 inRun = False
 
-        self.rtLabel['text'] = str(round(runTime/60/60,1)) + ' hours'
+        self.rtLabel['text'] = str(round(runTime/60/60,1)) + " hours from " + self.firstDate + " to " + self.lastDate
     
     #open the waites csv file and create list of timestamps
     def getVibFile(self):
         f = filedialog.askopenfilename()
-        with open(f) as csvdata:
-            csv_reader = csv.DictReader(csvdata)
+        with open(f, encoding='utf-8-sig') as csvdata:
+            csv_reader = csv.DictReader(csvdata, quotechar='"', delimiter=',', quoting=csv.QUOTE_NONNUMERIC, skipinitialspace=True)
             errCount = 0
+            VibrationPointName = csv_reader.fieldnames[1]
             for row in csv_reader:
-                timeStamp = time.mktime(datetime.datetime.strptime(row['DateTime'], "%m/%d/%Y %H:%M").timetuple())
-                #timeStamp = time.mktime(datetime.datetime.strptime(row['DateTime'], "%Y-%m-%d %H:%M:%s").timetuple())
+                #timeStamp = time.mktime(datetime.datetime.strptime(row['DateTime'], "%m/%d/%Y %H:%M").timetuple())
+                timeStamp = time.mktime(datetime.datetime.strptime(row['DateTime'], "%Y-%m-%d %H:%M:%S").timetuple())
                 try:
-                    amplitude = float(row['Motor - DS'])
+                    amplitude = float(row[VibrationPointName])
                 except:
                     errCount +=1
                     amplitude = 0
@@ -73,7 +74,13 @@ class App(tk.Tk):
         
         self.getVibFile()
         maxAmp = max(samples, key = lambda x:x.amplitude).amplitude
+        
+        self.firstDate = min(samples, key = lambda x:x.timestamp).timestamp
+        self.lastDate = max(samples, key = lambda x:x.timestamp).timestamp
 
+        self.firstDate = time.strftime('%m/%d/%Y', time.localtime(self.firstDate))
+        self.lastDate = time.strftime('%m/%d/%Y', time.localtime(self.lastDate))
+        
         self.resizable(width=True, height=True)
 
         self.welcomeLabel = ttk.Label(master=self, text="Move the slider to change vibration threshold.")
@@ -86,8 +93,8 @@ class App(tk.Tk):
             command=self.calcRunTime
         )
         
-        self.sliderLabel = ttk.Label(text=self.getCurrentValue())
-
+        labelText = self.getCurrentValue()
+        self.sliderLabel = ttk.Label(text=labelText)
         
         self.vibThreshold = ttk.Scale(from_=0, 
                                       to=maxAmp,
@@ -114,4 +121,5 @@ class App(tk.Tk):
 
 if __name__ == '__main__':
     app = App()
+    app.attributes('-topmost', True)
     app.mainloop()
