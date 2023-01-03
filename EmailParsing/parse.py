@@ -11,6 +11,8 @@ directory = r'C:\Users\kddc053\OneDrive - AZCollaboration\Desktop\shiftreports'
 countShiftReports = 0
 valveArray = np.array([])
 
+valveStringIndex = 9
+
 print("Iterating through the files...")
 #iterate through the files in the directory
 for file in os.listdir(directory):
@@ -30,7 +32,7 @@ for file in os.listdir(directory):
                         #iterate through the indexes and add the substring of HV- plus 9 characters
                         for i in HVindexes:
                             #building array of valves
-                            valveArray = np.append(valveArray, msg.Body[i:i+9])
+                            valveArray = np.append(valveArray, msg.Body[i:i+valveStringIndex])
 
                         # print(file, ":\t\t" , len(HVindexes))
         except:
@@ -59,5 +61,7 @@ uniqueValveCount.sort(order='count')
 uniqueValveCount = uniqueValveCount[::-1]
 
 #print the ordred list of valves to the screen
+i = 1
 for valve in uniqueValveCount:
-    print(valve)
+    print(i, ") ", valve)
+    i = i + 1
